@@ -3,4 +3,5 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-TOKEN = os.getenv('TOKEN')
+TOKEN : str = os.getenv('TOKEN')
+DATABASE : str = os.getenv('DATABASE')
