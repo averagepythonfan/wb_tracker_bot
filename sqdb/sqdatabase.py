@@ -43,6 +43,23 @@ async def insert_user(userid : int, username : str, status : str = 'free'):
     cur.execute(f"INSERT INTO users ( userid, username, status) VALUES ( {userid}, '{username}', '{status}')")
     conn.commit()
 
+async def check_products_count(userid : int):
+    res = cur.execute(f'''
+    SELECT article FROM products
+    WHERE userid = {userid};
+    ''')
+    return len(res.fetchall())
+
+async def check_status(userid : int):
+    res = cur.execute(f'SELECT status FROM users WHERE userid = {userid}')
+    return res.fetchall()
+
+async def insert_product(article : int, userid : int, name : str = 'None'):
+    cur.execute(f'''
+        INSERT INTO products VALUES ( {article}, '{name}', {userid});
+    ''')
+    conn.commit()
+
 async def insert_track(article : int, name : str, price : int, userid : int, data : int):
     cur.execute(f'''
         INSERT INTO tracker VALUES ( {article}, '{name}', {price}, {userid}, {data})
