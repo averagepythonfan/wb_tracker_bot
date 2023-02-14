@@ -1,0 +1,6 @@
+/venv
+.env
+/__pycache__
+/handlers/__pycache__
+sqdb/__pycache__
+wb.db

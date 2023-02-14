@@ -17,7 +17,6 @@ def connect_to_db():
         cur.execute('''
         CREATE TABLE IF NOT EXISTS products
         (article INTEGER NOT NULL,
-        name TEXT,
         userid INTEGER NOT NULL
         );''')
 
@@ -35,12 +34,12 @@ def connect_to_db():
     except sq.Error as error:
         print(f'Error {error}')
 
-async def fetch_articles(user_id : int) -> list:
-    res = cur.execute('SELECT article FROM products;')
+async def fetch_products(userid : int) -> list:
+    res = cur.execute(f'SELECT article, name, price FROM tracker WHERE userid = {userid};')
     return res.fetchall()
 
 async def insert_user(userid : int, username : str, status : str = 'free'):
-    cur.execute(f"INSERT INTO users ( userid, username, status) VALUES ( {userid}, '{username}', '{status}')")
+    cur.execute(f"INSERT INTO users ( userid, username, status) VALUES ( {userid}, '{username}', '{status}');")
     conn.commit()
 
 async def check_products_count(userid : int):
@@ -50,19 +49,31 @@ async def check_products_count(userid : int):
     ''')
     return len(res.fetchall())
 
+async def check_product_exist(article : int, userid : int):
+    res = cur.execute(f'''
+    SELECT article FROM products
+    WHERE article = {article} AND userid = {userid};
+    ''')
+    return len(res.fetchall())
+
+
 async def check_status(userid : int):
     res = cur.execute(f'SELECT status FROM users WHERE userid = {userid}')
     return res.fetchall()
 
-async def insert_product(article : int, userid : int, name : str = 'None'):
+async def insert_product(article : int, userid : int):
     cur.execute(f'''
-        INSERT INTO products VALUES ( {article}, '{name}', {userid});
+        INSERT INTO products VALUES ( {article}, {userid});
     ''')
+    conn.commit()
+
+async def delete_product(article : int, userid : int):
+    cur.execute(f'DELETE FROM products WHERE article = {article} AND userid = {userid};')
     conn.commit()
 
 async def insert_track(article : int, name : str, price : int, userid : int, data : int):
     cur.execute(f'''
-        INSERT INTO tracker VALUES ( {article}, '{name}', {price}, {userid}, {data})
+        INSERT INTO tracker VALUES ( {article}, '{name}', {price}, {userid}, {data});
     ''')
     conn.commit()
 
