@@ -32,7 +32,11 @@ async def register_user_command(message : types.Message):
     '''Регистрирует пользователя в базе данных. По дефолту на бесплатном тарифе. Если пользователь уже зарегистрирован, сообщает ему об этом.
     '''
     try:
-        await insert_user(message.from_user.id, message.from_user.username)
+        async with transaction() as cur:
+            cur.execute(
+                f'''INSERT INTO users ( userid, username, status)
+                        VALUES ( {message.from_user.id}, '{message.from_user.username}', 'free');'''
+            )
         await message.reply('Успешно')
     except IntegrityError:
         await message.reply('Уже зарегистрированы')
@@ -43,16 +47,25 @@ async def add_product_command(message : types.Message):
     '''Добавляет продукт в таблицу products. Максимальное количество 3 при тарифе "free".
     Не позволяет добавлять продукты не зарегистрированным пользователям. Так же не позволяет добавлять не валидные артикулы.
     '''
-    count = await check_products_count(message.from_user.id)
-    status = await check_status(message.from_user.id)
+    
+    async with transaction() as cur:
+        lenght = cur.execute(
+            f'''SELECT article FROM products
+                WHERE userid = {message.from_user.id};'''
+            ).fetchall()
+    count = len(lenght)
+
+    async with transaction() as cur:
+        status = cur.execute(f'SELECT status FROM users WHERE userid = {message.from_user.id}').fetchall()
+    
     if len(status) == 0:
         await message.reply('Зарегистрируйтесь')
     elif count < 3 or status == 'premium':
         try:
-            await insert_product(
-                int(message.get_args()),
-                message.from_user.id
-            )
+            async with transaction() as cur:
+                cur.execute(
+                    f'''INSERT INTO products VALUES ( {int(message.get_args())}, {message.from_user.id});'''
+                )
             await message.reply('Успешно')
         except ValueError:
             await message.reply('Введите валидный артикул')
@@ -63,11 +76,19 @@ async def add_product_command(message : types.Message):
 async def delete_product_command(message : types.Message):
     '''Удаляет товар по артикулу. Если такого товара нет, сообщает об этом пользователю. Если товар успешно удален, также сообщает пользователю.
     '''
-    try:
-        count = await check_product_exist(int(message.get_args()), message.from_user.id)
+    try:   
+        async with transaction() as cur:
+            lenght = cur.execute(
+                f'''SELECT article FROM products
+                    WHERE article = {int(message.get_args())} AND userid = {message.from_user.id};'''
+            ).fetchall()
+        count = len(lenght)
         if count == 0:
             raise ZeroValues()
-        await delete_product(int(message.get_args()), message.from_user.id)
+        
+        async with transaction() as cur:
+            cur.execute(f'DELETE FROM products WHERE article = {int(message.get_args())} AND userid = {message.from_user.id};')
+        
         await message.reply('Товар успешно удален')
     except ValueError:
         await message.reply('Введите валидный артикул')

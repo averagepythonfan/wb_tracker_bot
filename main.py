@@ -1,4 +1,4 @@
-import logging
+#import logging
 from aiogram import Bot, Dispatcher, executor
 from config import TOKEN
 from sqdb import connect_to_db
