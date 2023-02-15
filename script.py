@@ -7,7 +7,7 @@ import sys
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
-from config import DATABASE
+from sqdb import transaction_sync
 
 #set logger
 logger = logging.getLogger(__name__)
@@ -15,9 +15,6 @@ logger.setLevel('DEBUG')
 handler = logging.StreamHandler(stream=sys.stdout)
 logger.addHandler(handler)
 
-#set connection
-conn = sq.connect(DATABASE)
-cur = conn.cursor()
 
 #set options for webdriver
 options = Options()
@@ -27,7 +24,9 @@ options.add_argument("-headless")
 #infinite update
 while True:
     with webdriver.Remote(options=options) as driver:
-        products = cur.execute('SELECT * FROM products;').fetchall()
+        #products = cur.execute('SELECT * FROM products;').fetchall()
+        with transaction_sync() as cur:
+            products = cur.execute('SELECT * FROM products;').fetchall()
         logger.debug(f'Fetched pairs. Lenght : {len(products)}')
         for el in products:
             logger.debug(f'Start parsing for {el}')
@@ -45,11 +44,11 @@ while True:
             wb_search_title = driver.find_element(By.CLASS_NAME, "product-page__header")
             couple = (wb_search_title.text.replace('\n', ' '), int(final_price))
 
-            cur.execute(f'''
-                INSERT INTO tracker ( article, name, price, userid, data )
-                    VALUES ( {el[0]}, '{couple[0]}', {couple[1]}, {el[1]}, {int(time.time())});
-            ''')
-            conn.commit()
+            with transaction_sync() as cur:
+                cur.execute(
+                    f'''INSERT INTO tracker ( article, name, price, userid, data )
+                        VALUES ( {el[0]}, '{couple[0]}', {couple[1]}, {el[1]}, {int(time.time())});'''
+                    )
             logger.debug(f'Successfull commit for {el}, {couple}')
             
             time.sleep(random.randrange(8, 15))
