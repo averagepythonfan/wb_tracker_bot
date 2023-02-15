@@ -11,7 +11,7 @@ async def transaction(db_name : str = DATABASE):
     conn.close()
 
 @contextmanager
-async def transaction_sync(db_name : str = DATABASE):
+def transaction_sync(db_name : str = DATABASE):
     conn = sq.connect(db_name)
     cur = conn.cursor()
     yield cur

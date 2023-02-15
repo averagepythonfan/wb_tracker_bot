@@ -4,3 +4,4 @@
 /handlers/__pycache__
 sqdb/__pycache__
 wb.db
+/sqdb/sqdatabase.py
