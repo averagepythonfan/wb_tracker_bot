@@ -14,6 +14,8 @@ async def on_startup(_):
 
 if __name__ == '__main__':
     try:
-        executor.start_polling(dispatcher=dp, on_startup=on_startup)
+        executor.start_polling(dispatcher=dp,
+                               on_startup=on_startup,
+                               skip_updates=True)
     except KeyboardInterrupt:
         print('Goodbye!')

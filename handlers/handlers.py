@@ -80,7 +80,7 @@ async def add_product_command(message: types.Message):
     
     if len(status) == 0:
         await message.reply('Зарегистрируйтесь')
-    elif count < 3 or status == 'premium':
+    elif count < 3 or status[0][0] == 'premium':
         try:
             async with transaction() as cur:
                 cur.execute(
@@ -132,6 +132,11 @@ async def my_products_command(message: types.Message):
                 WHERE article = {el[0]}
                 ORDER BY data DESC
                 LIMIT 1;''').fetchall()
+        try:
+            int(name_and_price[0][1])
+        except IndexError:
+            await message.answer(f'Артикул {el[0]} пока не имеет обновлении!')
+            continue
         await message.answer(
             text=f'<b>Артикул</b>: {str(el[0])}\n'
                 f'<b>Товар</b>: {name_and_price[0][0]}\n'
@@ -164,6 +169,19 @@ async def callback_delete(callback: CallbackQuery):
 
 async def callback_cancel(callback: CallbackQuery):
     '''Отменяет удаление'''
+    async with transaction() as cur:
+        lenght = cur.execute(
+            f'''SELECT article FROM products
+                WHERE userid = {callback.from_user.id};'''
+            ).fetchall()
+    count = len(lenght)
+
+    async with transaction() as cur:
+        status = cur.execute(f'SELECT status FROM users WHERE userid = {callback.from_user.id}').fetchall()
+
+    if count >= 3 and status[0][0] == 'free':
+        await callback.answer()
+        return await callback.message.answer('Превышен лимит')
     text =  callback.message.text
     article = int(text[17:text.find('успешно')-1])
     userid = int(callback.from_user.id)
