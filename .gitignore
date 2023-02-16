@@ -7,3 +7,4 @@ wb.db
 docker_commands.txt
 /sqdb/sqdatabase.py
 /tests
+test_last_two.py

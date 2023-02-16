@@ -79,7 +79,7 @@ async def insert_track(article : int, name : str, price : int, userid : int, dat
 
 async def select_last_two_rows(article : int) -> list:
     res = cur.execute(f'''
-        SELECT * FROM tracker
+        SELECT price FROM tracker
         WHERE article = {article}
         ORDER BY data DESC
         LIMIT 2;
