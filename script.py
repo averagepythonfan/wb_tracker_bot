@@ -71,7 +71,6 @@ while True:
                         f'https://api.telegram.org/bot{TOKEN}'
                         f'/sendMessage?chat_id={res[0][1]}&text='
                         f'Ваш товар {res[0][2]} изменил стоимость с {res[1][0]} на {res[0][0]}')
-            
             time.sleep(random.randrange(8, 15))
 
     interval = random.randrange(3000, 3600)

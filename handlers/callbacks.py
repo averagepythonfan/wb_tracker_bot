@@ -1,4 +1,3 @@
-from email import message
 from sqlite3 import IntegrityError
 from sqdb import transaction
 from aiogram.types import CallbackQuery
@@ -33,12 +32,13 @@ async def callback_cancel(callback: CallbackQuery):
     count = len(lenght)
 
     async with transaction() as cur:
-        status = cur.execute(f'SELECT status FROM users WHERE userid = {callback.from_user.id}').fetchall()
-
+        status = cur.execute(f'''
+            SELECT status FROM users
+            WHERE userid = {callback.from_user.id}''').fetchall()
     if count >= 3 and status[0][0] == 'free':
         await callback.answer()
         return await callback.message.answer('Превышен лимит')
-    text =  callback.message.text
+    text = callback.message.text
     article = int(text[17:text.find('успешно')-1])
     userid = int(callback.from_user.id)
     async with transaction() as cur:
@@ -47,7 +47,8 @@ async def callback_cancel(callback: CallbackQuery):
                 VALUES ( {article}, {userid});'''
         )
     await callback.message.delete()
-    await callback.message.answer(f'Товар с артикулом {article} возвращен в трекер.')
+    await callback.message.answer(
+        f'Товар с артикулом {article} возвращен в трекер.')
     await callback.answer()
 
 
@@ -58,8 +59,11 @@ async def callback_register(callback: CallbackQuery):
         async with transaction() as cur:
             cur.execute(
                 f'''INSERT INTO users ( userid, username, status)
-                        VALUES ( {callback.from_user.id}, '{callback.from_user.username}', 'free');'''
-            )
+                        VALUES (
+                            {callback.from_user.id},
+                            '{callback.from_user.username}',
+                            'free'
+                        );''')
         await callback.message.answer('Успешно')
     except IntegrityError:
         await callback.message.answer('Уже зарегистрированы')
