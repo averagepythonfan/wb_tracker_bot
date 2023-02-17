@@ -1,7 +1,6 @@
 /venv
-.env
+.env.example
 /__pycache__
 /handlers/__pycache__
 sqdb/__pycache__
-/sqdb/sqdatabase.py
 docker_commands.txt
