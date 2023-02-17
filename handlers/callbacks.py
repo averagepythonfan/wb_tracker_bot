@@ -1,3 +1,4 @@
+from email import message
 from sqlite3 import IntegrityError
 from sqdb import transaction
 from aiogram.types import CallbackQuery
@@ -62,4 +63,16 @@ async def callback_register(callback: CallbackQuery):
         await callback.message.answer('Успешно')
     except IntegrityError:
         await callback.message.answer('Уже зарегистрированы')
+    await callback.answer()
+
+
+async def callback_cancel_premium(callback: CallbackQuery):
+    '''Отменяет добавление пользователя в премиум статус.
+    '''
+    async with transaction() as cur:
+        cur.execute(f'''
+        UPDATE users
+            SET status = 'free'
+            WHERE userid = {int(callback.message.text)};''')
+    await callback.message.answer('Set "free": Успешно')
     await callback.answer()

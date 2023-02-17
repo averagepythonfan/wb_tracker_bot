@@ -23,3 +23,9 @@ button_3 = InlineKeyboardButton(
                 text='Добавить себя в базу данных',
                 callback_data='register_button_pressed')
 kb_register.add(button_3)
+
+kb_cancel_prem = InlineKeyboardMarkup()
+button_4 = InlineKeyboardButton(
+                text='Отменить действие',
+                callback_data='cancel_prem_button_pressed')
+kb_cancel_prem.add(button_4)

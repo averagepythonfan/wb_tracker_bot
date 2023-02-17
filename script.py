@@ -56,7 +56,6 @@ while True:
                             {int(time.time())});''')
             logger.debug(f'Successfull commit for {el}, {couple}')
 
-            # NEED TO TEST
             with transaction_sync() as cur:
                 products = cur.execute('SELECT * FROM products;').fetchall()
             for el in products:
@@ -75,7 +74,7 @@ while True:
             
             time.sleep(random.randrange(8, 15))
 
-    interval = random.randrange(3600, 4800)
+    interval = random.randrange(3000, 3600)
     logger.debug(f'Sleep for {interval}')
     try:
         time.sleep(interval)
