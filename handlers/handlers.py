@@ -176,35 +176,52 @@ async def add_premium_user(message: types.Message):
 
 
 def register_message_handlers(dp: Dispatcher):
+    '''Регистрируем обработчики'''
+    
     dp.register_message_handler(show_my_status,
                                 Command(commands=['status']))
+    
     dp.register_message_handler(show_my_status,
                                 Text(['status']))
+    
     dp.register_message_handler(echo_command,
                                 Text(['echo']))
+    
     dp.register_message_handler(help_command,
                                 Command(commands=['help', 'помощь']))
+    
     dp.register_message_handler(help_command,
                                 Text(['help', 'помощь']))
+    
     dp.register_message_handler(register_user_command,
                                 Command(commands=['register', 'регистрация']))
+    
     dp.register_message_handler(register_user_command,
                                 Text(['register', 'регистрация']))
+    
     dp.register_message_handler(add_product_command,
                                 Command(commands=['add', 'добавь']))
+    
     dp.register_message_handler(my_products_command,
                                 Command(commands=['my_products', 'продукты']))
+    
     dp.register_message_handler(my_products_command,
                                 Text(['my_products', 'продукты']))
+    
     dp.register_message_handler(delete_product_command,
                                 Command(commands=['delete', 'удалить']))
+    
     dp.register_message_handler(add_premium_user,
                                 Command(commands=['set_premium']))
+    
     dp.register_callback_query_handler(callback_delete,
                                        text='delete_button_pressed')
+    
     dp.register_callback_query_handler(callback_cancel,
                                        text='cancel_button_pressed')
+    
     dp.register_callback_query_handler(callback_register,
                                        text='register_button_pressed')
+    
     dp.register_callback_query_handler(callback_cancel_premium,
                                        text='cancel_prem_button_pressed')
