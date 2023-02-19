@@ -3,6 +3,7 @@
 /__pycache__
 /handlers/__pycache__
 sqdb/__pycache__
+/sqdb/sqdatabase.py
 wb.db
 docker_commands.txt
 test_last_two.py
