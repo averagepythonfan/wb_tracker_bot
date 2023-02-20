@@ -9,17 +9,11 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-ENV TOKEN=YOUR_TOKEN
-ENV DATABASE=YOUR_DB.db
-ENV ADMIN_ID=YOUR_ID
-
 COPY handlers/ handlers/
 COPY sqdb/ sqdb/
-COPY .env .
 COPY config.py .
 COPY main.py .
 COPY script.py .
-
 
 COPY --from=builder /app/wheels /wheels
 COPY --from=builder /app/requirements.txt .
@@ -31,6 +25,4 @@ RUN apt update && apt install -y curl && apt install -y net-tools && addgroup --
 
 USER app
 
-ENTRYPOINT [ "python3" ]
-
-CMD [ "script.py" ]
+CMD [ "python3", "main.py", "&&", "python3", "script.py" ]

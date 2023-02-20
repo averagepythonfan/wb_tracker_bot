@@ -1,0 +1,23 @@
+version: "3.8"
+services:
+  geckodriver:
+    build: ./docker/geckodriver
+    ports:
+      - "4444:4444"
+    deploy:
+      resources:
+        limits:
+          memory: "1G"
+
+  main_tg:
+    build: .
+    environment:
+      - TOKEN=6230415840:AAGf1IbOQa_xCkF_fwzpTSAqdbkpP-qbAPw
+      - DATABASE=wildberries.db
+      - ADMIN_ID=875851287
+      - COMMAND_EXECUTOR=http://172.18.0.1:4444
+      
+networks:
+  network1:
+    name: wb_net
+    external: true
