@@ -6,7 +6,8 @@ from aiogram import Dispatcher
 from aiogram import types
 from aiogram.dispatcher.filters import Command, Text
 from sqdb import transaction
-from sqlite3 import IntegrityError
+from sqlalchemy import text
+from sqlalchemy import exc
 from time import localtime, strftime
 from .inlinekb import kb_delete, kb_register, kb_cancel_prem
 from .callbacks import *
@@ -42,15 +43,15 @@ async def register_user_command(message: types.Message):
     '''
     try:
         async with transaction() as cur:
-            cur.execute(f'''
+            cur.execute(text(f'''
                 INSERT INTO users ( userid, username, status)
                 VALUES (
                     {message.from_user.id},
                     '{message.from_user.username}',
                     'free'
-                );''')
+                );'''))
         await message.reply('Успешно')
-    except IntegrityError:
+    except exc.IntegrityError:
         await message.reply('Уже зарегистрированы')
 
 
@@ -61,25 +62,25 @@ async def add_product_command(message: types.Message):
     Так же не позволяет добавлять не валидные артикулы.
     '''
     async with transaction() as cur:
-        lenght = cur.execute(f'''
+        lenght = cur.execute(text(f'''
             SELECT article FROM products
-            WHERE userid = {message.from_user.id};''').fetchall()
+            WHERE userid = {message.from_user.id};''')).fetchall()
     count = len(lenght)
 
     async with transaction() as cur:
-        status = cur.execute(f'''
+        status = cur.execute(text(f'''
             SELECT status FROM users
-            WHERE userid = {message.from_user.id};''').fetchall()
+            WHERE userid = {message.from_user.id};''')).fetchall()
 
     if len(status) == 0:
         await message.reply('Зарегистрируйтесь')
     elif count < 3 or status[0][0] == 'premium':
         try:
             async with transaction() as cur:
-                cur.execute(f'''
+                cur.execute(text(f'''
                     INSERT INTO products VALUES (
                         {int(message.get_args())},
-                        {message.from_user.id});''')
+                        {message.from_user.id});'''))
             await message.reply('Успешно')
         except ValueError:
             await message.reply('Введите валидный артикул')
@@ -94,18 +95,18 @@ async def delete_product_command(message: types.Message):
     '''
     try:
         async with transaction() as cur:
-            lenght = cur.execute(f'''
+            lenght = cur.execute(text(f'''
                 SELECT article FROM products
                 WHERE article = {int(message.get_args())}
-                AND userid = {message.from_user.id};''').fetchall()
+                AND userid = {message.from_user.id};''')).fetchall()
         count = len(lenght)
         if count == 0:
             raise ZeroValues()
 
         async with transaction() as cur:
-            cur.execute(f'''DELETE FROM products
+            cur.execute(text(f'''DELETE FROM products
             WHERE article = {int(message.get_args())}
-            AND userid = {message.from_user.id};''')
+            AND userid = {message.from_user.id};'''))
         await message.reply('Товар успешно удален')
     except ValueError:
         await message.reply('Введите валидный артикул')
@@ -117,17 +118,17 @@ async def my_products_command(message: types.Message):
     '''Возвращает список отслеживаемых товаров с ценами.
     '''
     async with transaction() as cur:
-        articles = cur.execute(f'''
+        articles = cur.execute(text(f'''
             SELECT article FROM products
-            WHERE userid = {message.from_user.id};''').fetchall()
+            WHERE userid = {message.from_user.id};''')).fetchall()
 
     for el in articles:
         async with transaction() as cur:
-            name_and_price = cur.execute(f'''
+            name_and_price = cur.execute(text(f'''
                 SELECT name, price, data FROM tracker
                 WHERE article = {el[0]}
                 ORDER BY data DESC
-                LIMIT 1;''').fetchall()
+                LIMIT 1;''')).fetchall()
         try:
             int(name_and_price[0][1])
         except IndexError:
@@ -148,10 +149,10 @@ async def show_my_status(message: types.Message):
     '''
     '''
     async with transaction() as cur:
-        res = cur.execute(f'''
+        res = cur.execute(text(f'''
             SELECT * FROM users
             WHERE userid = {int(message.from_user.id)};
-        ''').fetchall()
+        ''')).fetchall()
 
     await message.answer(
         text=f'<b>ID</b>: {res[0][0]}\n'
@@ -168,10 +169,10 @@ async def add_premium_user(message: types.Message):
     if message.from_user.id != ADMIN_ID:
         return await message.reply('Ты не админ')
     async with transaction() as cur:
-        cur.execute(f'''
-        UPDATE users
+        cur.execute(text(f'''
+            UPDATE users
             SET status = 'premium'
-            WHERE userid = {int(message.get_args())};''')
+            WHERE userid = {int(message.get_args())};'''))
     await message.reply(f'{message.get_args()}', reply_markup=kb_cancel_prem)
 
 

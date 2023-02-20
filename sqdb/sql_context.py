@@ -1,19 +1,30 @@
-import sqlite3 as sq
+from sqlalchemy import URL, create_engine
 from contextlib import asynccontextmanager, contextmanager
-from config import DATABASE
+from config import DATABASE, DRIVERNAME, USERNAME, PASSWORD, PORT, HOST
+
+
+params = {
+    "drivername": DRIVERNAME,
+    "username": USERNAME,
+    "password": PASSWORD,
+    "host": HOST,
+    "port": PORT,
+    "database": DATABASE
+}
+
+url_object = URL.create(**params)
+engine = create_engine(url_object)
 
 @asynccontextmanager
-async def transaction(db_name : str = DATABASE):
-    conn = sq.connect(db_name)
-    cur = conn.cursor()
-    yield cur
+async def transaction():
+    conn = engine.connect()
+    yield conn
     conn.commit()
     conn.close()
 
 @contextmanager
-def transaction_sync(db_name : str = DATABASE):
-    conn = sq.connect(db_name)
-    cur = conn.cursor()
-    yield cur
+def transaction_sync():
+    conn = engine.connect()
+    yield conn
     conn.commit()
     conn.close()
