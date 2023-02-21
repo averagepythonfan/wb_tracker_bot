@@ -8,8 +8,8 @@ load_dotenv()
 # tg_bot
 TOKEN: str = os.getenv('TOKEN')
 ADMIN_ID: int = int(os.getenv('ADMIN_ID'))
-COMMAND_EXECUTOR = os.getenv('COMMAND_EXECUTOR')
-
+COMMAND_EXECUTOR: str = os.getenv('COMMAND_EXECUTOR')
+ADMIN_USERNAME: str = os.getenv('ADMIN_USERNAME')
 
 # psql_server
 DRIVERNAME: str = os.getenv('DRIVERNAME')
