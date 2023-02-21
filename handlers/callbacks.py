@@ -1,8 +1,9 @@
-from sqlite3 import IntegrityError
+from sqlalchemy import exc
 from sqdb import transaction
 from aiogram.types import CallbackQuery
 from .inlinekb import kb_cancel
 from sqlalchemy import text
+from logger import logger
 
 async def callback_delete(callback: CallbackQuery):
     '''Удаляет выбранный товар из базы данных products
@@ -19,6 +20,7 @@ async def callback_delete(callback: CallbackQuery):
         text=f'Товар с артикулом {article} успешно удален',
         reply_markup=kb_cancel
     )
+    logger.debug(f'User {callback.message.from_user.username} deleted product {article}')
     await callback.answer()
 
 
@@ -47,6 +49,7 @@ async def callback_cancel(callback: CallbackQuery):
     await callback.message.delete()
     await callback.message.answer(
         f'Товар с артикулом {article} возвращен в трекер.')
+    logger.debug(f'User {callback.message.from_user.username} cancel delete command {article}')
     await callback.answer()
 
 
@@ -63,7 +66,8 @@ async def callback_register(callback: CallbackQuery):
                             'free'
                         );'''))
         await callback.message.answer('Успешно')
-    except IntegrityError:
+        logger.debug(f'User {callback.message.from_user.username} registered')
+    except exc.IntegrityError:
         await callback.message.answer('Уже зарегистрированы')
     await callback.answer()
 
@@ -77,4 +81,5 @@ async def callback_cancel_premium(callback: CallbackQuery):
             SET status = 'free'
             WHERE userid = {int(callback.message.text)};'''))
     await callback.message.answer('Set "free": Успешно')
+    logger.debug(f'Admin set free status for {callback.message.text}')
     await callback.answer()
