@@ -8,3 +8,4 @@ wb.db
 docker_commands.txt
 test_last_two.py
 /pgdata/*
+/logger/__pycache__
