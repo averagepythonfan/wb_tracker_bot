@@ -7,3 +7,4 @@ sqdb/__pycache__
 wb.db
 docker_commands.txt
 test_last_two.py
+/pgdata/*
