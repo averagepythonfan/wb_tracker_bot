@@ -1,7 +1,9 @@
 __all__ = [
     'register_message_handlers'
 ]
-from config import ADMIN_ID
+
+from logger import logger
+from config import ADMIN_ID, ADMIN_USERNAME
 from aiogram import Dispatcher
 from aiogram import types
 from aiogram.dispatcher.filters import Command, Text
@@ -41,6 +43,7 @@ async def register_user_command(message: types.Message):
     По дефолту на бесплатном тарифе.
     Если пользователь уже зарегистрирован, сообщает ему об этом.
     '''
+    logger.info(f'User {message.from_user.id}, @{message.from_user.username} register')
     try:
         async with transaction() as cur:
             cur.execute(text(f'''
@@ -61,6 +64,7 @@ async def add_product_command(message: types.Message):
     Не позволяет добавлять продукты не зарегистрированным пользователям.
     Так же не позволяет добавлять не валидные артикулы.
     '''
+    logger.debug(f'User {message.from_user.username} add product {message.get_args()}')
     async with transaction() as cur:
         lenght = cur.execute(text(f'''
             SELECT article FROM products
@@ -93,6 +97,7 @@ async def delete_product_command(message: types.Message):
     Если такого товара нет, сообщает об этом пользователю.
     Если товар успешно удален, также сообщает пользователю.
     '''
+    logger.debug(f'User {message.from_user.username} deleted product {message.get_args()}')
     try:
         async with transaction() as cur:
             lenght = cur.execute(text(f'''
@@ -117,6 +122,7 @@ async def delete_product_command(message: types.Message):
 async def my_products_command(message: types.Message):
     '''Возвращает список отслеживаемых товаров с ценами.
     '''
+    logger.debug(f'User {message.from_user.username} asked for products')
     async with transaction() as cur:
         articles = cur.execute(text(f'''
             SELECT article FROM products
@@ -132,7 +138,9 @@ async def my_products_command(message: types.Message):
         try:
             int(name_and_price[0][1])
         except IndexError:
-            await message.answer(f'Артикул {el[0]} пока не имеет обновлении!')
+            await message.answer(
+                text=f'Артикул {el[0]} пока не имеет обновлении!\n'
+                f'Ближайшее обновление будет через 1-1,5 часа')
             continue
         await message.answer(
             text=f'<b>Артикул</b>: {str(el[0])}\n'
@@ -146,8 +154,9 @@ async def my_products_command(message: types.Message):
 
 
 async def show_my_status(message: types.Message):
+    '''Показывает настоящий статус пользователя, его ID и имя.
     '''
-    '''
+    logger.debug(f'User {message.from_user.username} asked for his status')
     async with transaction() as cur:
         res = cur.execute(text(f'''
             SELECT * FROM users
@@ -158,14 +167,16 @@ async def show_my_status(message: types.Message):
         text=f'<b>ID</b>: {res[0][0]}\n'
         f'<b>Username</b>: <i>{res[0][1]}</i>\n'
         f'<b>Статус</b>: <i>{res[0][2]}</i>\n\n'
-        f'Сменить свой статус можно написав админу: @forgottenbb',
+        f'Сменить свой статус можно написав админу: @{ADMIN_USERNAME}',
         parse_mode='HTML'
     )
 
 
 async def add_premium_user(message: types.Message):
+    '''Меняет статус пользователя на 'premium'.
+    Только для админа.
     '''
-    '''
+    logger.debug(f'Admin {message.from_user.username} change {message.get_args()} user status')
     if message.from_user.id != ADMIN_ID:
         return await message.reply('Ты не админ')
     async with transaction() as cur:

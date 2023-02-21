@@ -3,6 +3,8 @@ from config import TOKEN
 from handlers import register_message_handlers, commands_for_bot
 from sqdb import transaction
 from sqlalchemy import text
+from logger import logger
+
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(bot=bot)
@@ -33,7 +35,7 @@ async def on_startup(_):
             data INTEGER NOT NULL);'''))
     register_message_handlers(dp=dp)
     await bot.set_my_commands(commands=commands_for_bot)
-    print('Start!')
+    logger.info('Bot started!')
 
 
 if __name__ == '__main__':
@@ -42,4 +44,4 @@ if __name__ == '__main__':
                                on_startup=on_startup,
                                skip_updates=True)
     except KeyboardInterrupt:
-        print('Goodbye!')
+        logger.critical('Bot closed. Goodbye!')

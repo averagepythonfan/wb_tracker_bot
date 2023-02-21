@@ -1,21 +1,14 @@
 import time
 import random
 import re
-import logging
-import sys
 import requests
+from logger import logger
 from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from sqdb import transaction_sync
 from config import TOKEN, COMMAND_EXECUTOR
 from sqlalchemy import text
-
-# set logger
-logger = logging.getLogger(__name__)
-logger.setLevel('DEBUG')
-handler = logging.StreamHandler(stream=sys.stdout)
-logger.addHandler(handler)
 
 
 # set options for webdriver
