@@ -23,7 +23,7 @@ services:
         limits:
           memory: "1G"
     networks:
-      - wb_net
+      - your_net
   geckodrive:
     image: instrumentisto/geckodriver
     container_name: gecko
@@ -35,14 +35,14 @@ services:
           memory: "1G"
     command: --binary=/opt/firefox/firefox --log=debug host=0.0.0.0
     networks:
-      - wb_net
+      - your_net
   bot:
     build: .
     container_name: bot
     environment:
-      - TOKEN=6230415840:AAGf1IbOQa_xCkF_fwzpTSAqdbkpP-qbAPw
-      - ADMIN_ID=875851287
-      - ADMIN_USERNAME=forgottenbb
+      - TOKEN=YOUR_TOKEN
+      - ADMIN_ID=YOUR_ID
+      - ADMIN_USERNAME=YOUR_USERNAME
       - DRIVERNAME=postgresql
       - USERNAMEDB=postgres
       - PASSWORD=postgres
@@ -59,14 +59,14 @@ services:
           cpus: "0.25"
           memory: 256M
     networks:
-      - wb_net
+      - your_net
   parser:
     image: parser:final
     container_name: parser
     environment:
-      - TOKEN=6230415840:AAGf1IbOQa_xCkF_fwzpTSAqdbkpP-qbAPw
-      - ADMIN_ID=875851287
-      - ADMIN_USERNAME=forgottenbb
+      - TOKEN=YOUR_TOKEN
+      - ADMIN_ID=YOUR_ID
+      - ADMIN_USERNAME=YOUR_USERNAME
       - DRIVERNAME=postgresql
       - USERNAMEDB=postgres
       - PASSWORD=postgres
@@ -83,8 +83,8 @@ services:
           cpus: "0.25"
           memory: 256M
     networks:
-      - wb_net
+      - your_net
 networks:
-  wb_net:
+  your_net:
     external: true
-    name: wb_net
+    name: your_net
