@@ -4,3 +4,4 @@
 /handlers/__pycache__
 sqdb/__pycache__
 docker_commands.txt
+/pgdata

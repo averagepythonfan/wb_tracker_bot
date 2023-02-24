@@ -14,6 +14,7 @@ from sqlalchemy import text
 # set options for webdriver
 options = Options()
 options.add_argument("-headless")
+options.set_capability("marionette", False)
 
 
 # infinite update

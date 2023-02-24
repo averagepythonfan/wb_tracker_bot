@@ -52,12 +52,6 @@ ENV MOZ_HEADLESS=1
 
 EXPOSE 4444
 
-# Safety requirements
-RUN addgroup --gid 1001 --system app && \
-    adduser --no-create-home --shell /bin/false --disabled-password --uid 1001 --system --group app
-
-USER app
-
 ENTRYPOINT ["geckodriver"]
 
-CMD ["--binary=/opt/firefox/firefox", "--log=debug", "--host=0.0.0.0"]
+CMD ["--binary=/opt/firefox/firefox", "--log=debug", "host=0.0.0.0" ]

@@ -31,6 +31,7 @@ help_str = '''Вас привествует бот Wildberries-Tracker.\n
 
 async def help_command(message: types.Message):
     '''Отправляет пользователю сообщение с описанием работы бота.'''
+    logger.info(f'User {message.from_user.id} is asking for help')
     await message.reply(help_str, reply_markup=kb_register)
 
 

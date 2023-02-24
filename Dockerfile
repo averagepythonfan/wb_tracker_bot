@@ -9,12 +9,6 @@ FROM python:3.10-slim
 
 WORKDIR /app
 
-COPY handlers/ handlers/
-COPY sqdb/ sqdb/
-COPY config.py .
-COPY main.py .
-COPY script.py .
-
 COPY --from=builder /app/wheels /wheels
 COPY --from=builder /app/requirements.txt .
 
@@ -23,6 +17,14 @@ RUN pip install --no-cache /wheels/*
 RUN apt update && apt install -y curl && apt install -y net-tools && addgroup --gid 1001 --system app && \
     adduser --no-create-home --shell /bin/false --disabled-password --uid 1001 --system --group app
 
+COPY handlers/ handlers/
+COPY logger/ logger/
+COPY sqdb/ sqdb/
+COPY config.py .
+COPY main.py .
+
 USER app
 
-CMD [ "python3", "main.py", "&&", "python3", "script.py" ]
+ENTRYPOINT [ "python3" ]
+
+CMD [ "main.py" ]
