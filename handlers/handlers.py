@@ -48,10 +48,9 @@ async def register_user_command(message: types.Message):
     try:
         async with transaction() as cur:
             cur.execute(text(f'''
-                INSERT INTO users ( userid, username, status)
+                INSERT INTO users ( userid, status)
                 VALUES (
                     {message.from_user.id},
-                    '{message.from_user.username}',
                     'free'
                 );'''))
         await message.reply('Успешно')
@@ -166,8 +165,7 @@ async def show_my_status(message: types.Message):
 
     await message.answer(
         text=f'<b>ID</b>: {res[0][0]}\n'
-        f'<b>Username</b>: <i>{res[0][1]}</i>\n'
-        f'<b>Статус</b>: <i>{res[0][2]}</i>\n\n'
+        f'<b>Статус</b>: <i>{res[0][1]}</i>\n\n'
         f'Сменить свой статус можно написав админу: @{ADMIN_USERNAME}',
         parse_mode='HTML'
     )

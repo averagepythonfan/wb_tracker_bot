@@ -59,10 +59,9 @@ async def callback_register(callback: CallbackQuery):
     try:
         async with transaction() as cur:
             cur.execute(text(
-                f'''INSERT INTO users ( userid, username, status)
+                f'''INSERT INTO users ( userid, status )
                         VALUES (
                             {callback.from_user.id},
-                            '{callback.from_user.username}',
                             'free'
                         );'''))
         await callback.message.answer('Успешно')
