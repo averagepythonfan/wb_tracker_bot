@@ -148,7 +148,7 @@ async def my_products_command(message: types.Message):
             f'<b>Цена</b>: {name_and_price[0][1]} <b>RUB</b>\n'
             f'''<b>Последнее обновление</b>: {strftime(
                 "%d.%m.%y, %H:%M MCK",
-                localtime(name_and_price[0][2]))}''',
+                localtime(int(name_and_price[0][2]) + 10800))}''',
             parse_mode='HTML',
             reply_markup=kb_delete)
 
@@ -199,7 +199,7 @@ def register_message_handlers(dp: Dispatcher):
                                 Text(['echo']))
     
     dp.register_message_handler(help_command,
-                                Command(commands=['help', 'помощь']))
+                                Command(commands=['help', 'помощь', 'start']))
     
     dp.register_message_handler(help_command,
                                 Text(['help', 'помощь']))
