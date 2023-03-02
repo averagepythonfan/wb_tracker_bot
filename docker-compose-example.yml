@@ -18,73 +18,31 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    deploy:
-      resources:
-        limits:
-          memory: "1G"
     networks:
-      - your_net
+      - wb_net
   geckodrive:
     image: instrumentisto/geckodriver
     container_name: gecko
     ports:
       - "4444:4444"
-    deploy:
-      resources:
-        limits:
-          memory: "1G"
     command: --binary=/opt/firefox/firefox --log=debug host=0.0.0.0
     networks:
-      - your_net
+      - wb_net
   bot:
     build: .
     container_name: bot
-    environment:
-      - TOKEN=YOUR_TOKEN
-      - ADMIN_ID=YOUR_ID
-      - ADMIN_USERNAME=YOUR_USERNAME
-      - DRIVERNAME=postgresql
-      - USERNAMEDB=postgres
-      - PASSWORD=postgres
-      - HOST=172.18.0.1
-      - PORT=5433
-      - COMMAND_EXECUTOR=172.18.0.1
-      - DATABASE=wildberries
-    deploy:
-      resources:
-        limits:
-          cpus: "0.50"
-          memory: 512M
-        reservations:
-          cpus: "0.25"
-          memory: 256M
+    env_file:
+      - .env
     networks:
-      - your_net
+      - wb_net
   parser:
     image: parser:final
     container_name: parser
-    environment:
-      - TOKEN=YOUR_TOKEN
-      - ADMIN_ID=YOUR_ID
-      - ADMIN_USERNAME=YOUR_USERNAME
-      - DRIVERNAME=postgresql
-      - USERNAMEDB=postgres
-      - PASSWORD=postgres
-      - HOST=172.18.0.1
-      - PORT=5433
-      - COMMAND_EXECUTOR=172.18.0.1
-      - DATABASE=wildberries
-    deploy:
-      resources:
-        limits:
-          cpus: "0.50"
-          memory: 512M
-        reservations:
-          cpus: "0.25"
-          memory: 256M
+    env_file:
+      - .env
     networks:
-      - your_net
+      - wb_net
 networks:
-  your_net:
+  wb_net:
     external: true
-    name: your_net
+    name: wb_net
