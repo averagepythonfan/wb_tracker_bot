@@ -33,6 +33,8 @@ services:
     container_name: bot
     env_file:
       - .env
+    depends_on:
+      - psql_server
     networks:
       - wb_net
   parser:
@@ -40,6 +42,8 @@ services:
     container_name: parser
     env_file:
       - .env
+    depends_on:
+      - psql_server
     networks:
       - wb_net
 networks:
