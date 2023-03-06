@@ -16,7 +16,7 @@ async def on_startup(_):
         cur.execute(text('''
             CREATE TABLE IF NOT EXISTS users
             (userid INTEGER NOT NULL PRIMARY KEY,
-            status TEXT NOT NULL );'''))
+            trackers INTEGER NOT NULL );'''))
 
     async with transaction() as cur:
         cur.execute(text('''

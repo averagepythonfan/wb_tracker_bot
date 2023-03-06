@@ -25,10 +25,10 @@ services:
     container_name: gecko
     ports:
       - "4444:4444"
-    command: --binary=/opt/firefox/firefox --log=debug host=0.0.0.0
+    command: --binary=/opt/firefox/firefox --log=debug --host=0.0.0.0
     networks:
       - wb_net
-  bot:
+  bot_test_trackers_2:
     build: .
     container_name: bot
     env_file:

@@ -53,6 +53,7 @@ async def callback_cancel(callback: CallbackQuery):
     await callback.answer()
 
 
+# depricated
 async def callback_register(callback: CallbackQuery):
     '''Регистрирует пользователя в базе данных.
     '''
@@ -70,7 +71,7 @@ async def callback_register(callback: CallbackQuery):
         await callback.message.answer('Уже зарегистрированы')
     await callback.answer()
 
-
+# depricated
 async def callback_cancel_premium(callback: CallbackQuery):
     '''Отменяет добавление пользователя в премиум статус.
     '''

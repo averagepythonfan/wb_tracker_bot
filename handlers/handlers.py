@@ -11,7 +11,7 @@ from sqdb import transaction
 from sqlalchemy import text
 from sqlalchemy import exc
 from time import localtime, strftime
-from .inlinekb import kb_delete, kb_register, kb_cancel_prem
+from .inlinekb import kb_delete
 from .callbacks import *
 
 
@@ -21,9 +21,8 @@ class ZeroValues(BaseException):
 
 
 help_str = '''Вас привествует бот Wildberries-Tracker.\n
-Зарегистрируйтесь (команда /register) и можете добавлять товары в трекер.\n
 Чтобы добавить товар в трекер отправьте команду "/add (артикул товара)" без скобочек и ковычек.\n
-При тарифе "free" у вас в доступе три трекера.\n
+При стандартном тарифе у вас в доступе три трекера.\n
 Можно в любой момент удалять и добавлять другие товары для трекинга.\n
 Проверка цены происходит каждые 1-1,5 часа.\n
 Если товар поменяет свою цену, вам придет уведомление от бота.'''
@@ -32,13 +31,21 @@ help_str = '''Вас привествует бот Wildberries-Tracker.\n
 async def help_command(message: types.Message):
     '''Отправляет пользователю сообщение с описанием работы бота.'''
     logger.info(f'User {message.from_user.id} is asking for help')
-    await message.reply(help_str, reply_markup=kb_register)
+    try:
+        async with transaction() as cur:
+            cur.execute(text(f'''
+                INSERT INTO users ( userid, trackers)
+                VALUES ( {message.from_user.id}, 3 );'''))
+        logger.info(f'Register new user {message.from_user.id}')
+    except exc.IntegrityError:
+        logger.info(f'User {message.from_user.id} already exist')
+    await message.reply(help_str)
 
 
 async def echo_command(message: types.Message):
     await message.reply(message)
 
-
+# depricated
 async def register_user_command(message: types.Message):
     '''Регистрирует пользователя в базе данных.
     По дефолту на бесплатном тарифе.
@@ -72,13 +79,13 @@ async def add_product_command(message: types.Message):
     count = len(lenght)
 
     async with transaction() as cur:
-        status = cur.execute(text(f'''
-            SELECT status FROM users
+        trackers = cur.execute(text(f'''
+            SELECT trackers FROM users
             WHERE userid = {message.from_user.id};''')).fetchall()
-
-    if len(status) == 0:
-        await message.reply('Зарегистрируйтесь')
-    elif count < 3 or status[0][0] == 'premium':
+    # depricated
+    # if len(status) == 0:
+    #     await message.reply('Зарегистрируйтесь')
+    if count < int(trackers[0][0]):
         try:
             async with transaction() as cur:
                 cur.execute(text(f'''
@@ -140,7 +147,7 @@ async def my_products_command(message: types.Message):
         except IndexError:
             await message.answer(
                 text=f'Артикул {el[0]} пока не имеет обновлении!\n'
-                f'Ближайшее обновление будет через 1-1,5 часа')
+                f'Ближайшее обновление будет в течение часа')
             continue
         await message.answer(
             text=f'<b>Артикул</b>: {str(el[0])}\n'
@@ -165,7 +172,7 @@ async def show_my_status(message: types.Message):
 
     await message.answer(
         text=f'<b>ID</b>: {res[0][0]}\n'
-        f'<b>Статус</b>: <i>{res[0][1]}</i>\n\n'
+        f'<b>Количество трекеров</b>: <i>{res[0][1]}</i>\n\n'
         f'Сменить свой статус можно написав админу: @{ADMIN_USERNAME}',
         parse_mode='HTML'
     )
@@ -178,12 +185,13 @@ async def add_premium_user(message: types.Message):
     logger.debug(f'Admin {message.from_user.username} change {message.get_args()} user status')
     if message.from_user.id != ADMIN_ID:
         return await message.reply('Ты не админ')
+    id_and_trackers = message.get_args().split()
     async with transaction() as cur:
         cur.execute(text(f'''
             UPDATE users
-            SET status = 'premium'
-            WHERE userid = {int(message.get_args())};'''))
-    await message.reply(f'{message.get_args()}', reply_markup=kb_cancel_prem)
+            SET trackers = {int(id_and_trackers[1])}
+            WHERE userid = {int(id_and_trackers[0])};'''))
+    await message.reply(f'{message.get_args()}')
 
 
 def register_message_handlers(dp: Dispatcher):
@@ -203,12 +211,13 @@ def register_message_handlers(dp: Dispatcher):
     
     dp.register_message_handler(help_command,
                                 Text(['help', 'помощь']))
+
+    # depricated
+    # dp.register_message_handler(register_user_command,
+    #                             Command(commands=['register', 'регистрация']))
     
-    dp.register_message_handler(register_user_command,
-                                Command(commands=['register', 'регистрация']))
-    
-    dp.register_message_handler(register_user_command,
-                                Text(['register', 'регистрация']))
+    # dp.register_message_handler(register_user_command,
+    #                             Text(['register', 'регистрация']))
     
     dp.register_message_handler(add_product_command,
                                 Command(commands=['add', 'добавь']))
@@ -223,7 +232,7 @@ def register_message_handlers(dp: Dispatcher):
                                 Command(commands=['delete', 'удалить']))
     
     dp.register_message_handler(add_premium_user,
-                                Command(commands=['set_premium']))
+                                Command(commands=['set']))
     
     dp.register_callback_query_handler(callback_delete,
                                        text='delete_button_pressed')
@@ -231,8 +240,8 @@ def register_message_handlers(dp: Dispatcher):
     dp.register_callback_query_handler(callback_cancel,
                                        text='cancel_button_pressed')
     
-    dp.register_callback_query_handler(callback_register,
-                                       text='register_button_pressed')
+    # dp.register_callback_query_handler(callback_register,
+    #                                    text='register_button_pressed')
     
-    dp.register_callback_query_handler(callback_cancel_premium,
-                                       text='cancel_prem_button_pressed')
+    # dp.register_callback_query_handler(callback_cancel_premium,
+    #                                    text='cancel_prem_button_pressed')

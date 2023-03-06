@@ -7,4 +7,3 @@ sqdb/__pycache__
 docker_commands.txt
 /pgdata
 /logger/__pycache__
-docker-compose.yml
