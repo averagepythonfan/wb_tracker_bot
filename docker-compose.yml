@@ -28,7 +28,7 @@ services:
     command: --binary=/opt/firefox/firefox --log=debug --host=0.0.0.0
     networks:
       - wb_net
-  bot_test_trackers_2:
+  bot_stable:
     build: .
     container_name: bot
     env_file:
@@ -44,6 +44,7 @@ services:
       - .env
     depends_on:
       - psql_server
+      - geckodrive
     networks:
       - wb_net
 networks:

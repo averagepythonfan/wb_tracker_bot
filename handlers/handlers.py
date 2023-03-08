@@ -43,26 +43,11 @@ async def help_command(message: types.Message):
 
 
 async def echo_command(message: types.Message):
-    await message.reply(message)
-
-# depricated
-async def register_user_command(message: types.Message):
-    '''Регистрирует пользователя в базе данных.
-    По дефолту на бесплатном тарифе.
-    Если пользователь уже зарегистрирован, сообщает ему об этом.
-    '''
-    logger.info(f'User {message.from_user.id}, @{message.from_user.username} register')
-    try:
-        async with transaction() as cur:
-            cur.execute(text(f'''
-                INSERT INTO users ( userid, status)
-                VALUES (
-                    {message.from_user.id},
-                    'free'
-                );'''))
-        await message.reply('Успешно')
-    except exc.IntegrityError:
-        await message.reply('Уже зарегистрированы')
+    async with transaction() as cur:
+        trackers = cur.execute(text(f'''
+            SELECT trackers FROM users
+            WHERE userid = {message.from_user.id};''')).fetchall()
+    await message.reply(trackers)
 
 
 async def add_product_command(message: types.Message):
@@ -82,9 +67,7 @@ async def add_product_command(message: types.Message):
         trackers = cur.execute(text(f'''
             SELECT trackers FROM users
             WHERE userid = {message.from_user.id};''')).fetchall()
-    # depricated
-    # if len(status) == 0:
-    #     await message.reply('Зарегистрируйтесь')
+
     if count < int(trackers[0][0]):
         try:
             async with transaction() as cur:
@@ -211,13 +194,6 @@ def register_message_handlers(dp: Dispatcher):
     
     dp.register_message_handler(help_command,
                                 Text(['help', 'помощь']))
-
-    # depricated
-    # dp.register_message_handler(register_user_command,
-    #                             Command(commands=['register', 'регистрация']))
-    
-    # dp.register_message_handler(register_user_command,
-    #                             Text(['register', 'регистрация']))
     
     dp.register_message_handler(add_product_command,
                                 Command(commands=['add', 'добавь']))
@@ -239,9 +215,3 @@ def register_message_handlers(dp: Dispatcher):
     
     dp.register_callback_query_handler(callback_cancel,
                                        text='cancel_button_pressed')
-    
-    # dp.register_callback_query_handler(callback_register,
-    #                                    text='register_button_pressed')
-    
-    # dp.register_callback_query_handler(callback_cancel_premium,
-    #                                    text='cancel_prem_button_pressed')

@@ -51,35 +51,3 @@ async def callback_cancel(callback: CallbackQuery):
         f'Товар с артикулом {article} возвращен в трекер.')
     logger.debug(f'User {callback.message.from_user.username} cancel delete command {article}')
     await callback.answer()
-
-
-# depricated
-async def callback_register(callback: CallbackQuery):
-    '''Регистрирует пользователя в базе данных.
-    '''
-    try:
-        async with transaction() as cur:
-            cur.execute(text(
-                f'''INSERT INTO users ( userid, status )
-                        VALUES (
-                            {callback.from_user.id},
-                            'free'
-                        );'''))
-        await callback.message.answer('Успешно')
-        logger.debug(f'User {callback.message.from_user.username} registered')
-    except exc.IntegrityError:
-        await callback.message.answer('Уже зарегистрированы')
-    await callback.answer()
-
-# depricated
-async def callback_cancel_premium(callback: CallbackQuery):
-    '''Отменяет добавление пользователя в премиум статус.
-    '''
-    async with transaction() as cur:
-        cur.execute(text(f'''
-        UPDATE users
-            SET status = 'free'
-            WHERE userid = {int(callback.message.text)};'''))
-    await callback.message.answer('Set "free": Успешно')
-    logger.debug(f'Admin set free status for {callback.message.text}')
-    await callback.answer()
