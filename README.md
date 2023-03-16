@@ -21,27 +21,27 @@
 ## Для начала рабооты с ботом нужно (преполагается, что вы находитесь на сервере с debian-подобной операционной системой):
 Сперва скачать репозитории с GitHub
 ```
-> :$ git clone https://github.com/averagepythonfan/wb_tracker_bot.git
+:~# git clone https://github.com/averagepythonfan/wb_tracker_bot.git
 ```
 
 Затем сделать файл init.sh исполняемым и выполнить его
 ```
-> :$ chmod +x init.sh
-> :$ ./init.sh
+:~# chmod +x init.sh
+:~# ./init.sh
 ```
 
 Далее нужно переименовать файл с переменными окружения .env.example на .env
 ```
-> :$ mv .env.example .env
+:~# mv .env.example .env
 ```
 
 Замените все пропущенные значения на ваши, можете воспользоваться стандартными редакторами nano или vi
 ```
-> :$ nano .env
+:~# nano .env
 ```
 
 После замены можно запускать нашего бота со всей его прилагающейся архитектурой.
 Чтобы запустить контейнеры в режиме detached, воспользуйтесь флагом -d в команде:
 ```
-> :$ docker compose up -d
+:~# docker compose up -d
 ```
