@@ -7,3 +7,7 @@ sqdb/__pycache__
 docker_commands.txt
 /pgdata
 /logger/__pycache__
+/bot/__pycache__
+/bot/db/__pycache__
+/bot/db/migrations/__pycache__
+/bot/db/migrations/versions/__pycache__

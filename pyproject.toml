@@ -1,0 +1,21 @@
+[tool.poetry]
+name = "wildberries-tracker"
+version = "0.1.0"
+description = "Telegram Bot for tracking prices on WB"
+authors = ["averagepythonfan <djonvorobei@bk.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+python-dotenv = "^1.0.0"
+
+
+[tool.poetry.group.bot.dependencies]
+aiogram = "3.0.0b7"
+sqlalchemy = "^2.0.9"
+alembic = "^1.10.3"
+asyncpg = "^0.27.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
