@@ -1,18 +1,31 @@
-from sqlalchemy.ext.asyncio import create_async_engine as _create_async_engine
+__all__ = [
+    'async_session_maker'
+]
+
+
+from typing import AsyncGenerator
+
+from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.engine import URL
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from config import DATABASE, HOST, USERNAME, PASSWORD, PORT
 
 
-def create_async_engine(url: URL | str) -> AsyncEngine:
-    return _create_async_engine(url=url, echo=True, pool_pre_ping=True)
+postgres_url = URL.create(
+        drivername='postgresql+asyncpg',
+        username=USERNAME,
+        password=PASSWORD,
+        host=HOST,
+        port=PORT,
+        database=DATABASE
+    )
 
 
-async def proceed_schemas(engine: AsyncEngine, metadata):
-    async with engine.begin() as conn:
-        await conn.run_sync(metadata.create_all())
+engine: AsyncEngine = create_async_engine(url=postgres_url, echo=True)
+async_session_maker: AsyncSession = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
 
 
-def get_session_maker(engine: AsyncEngine) -> sessionmaker:
-    return sessionmaker(engine, class_=AsyncSession)
-
+# async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
+#     async with async_session_maker() as session:
+#         yield session

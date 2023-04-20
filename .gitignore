@@ -11,3 +11,5 @@ docker_commands.txt
 /bot/db/__pycache__
 /bot/db/migrations/__pycache__
 /bot/db/migrations/versions/__pycache__
+/notebooks
+/bot/handlers/__pycache__
