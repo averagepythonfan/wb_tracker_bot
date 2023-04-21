@@ -16,6 +16,13 @@ sqlalchemy = "^2.0.9"
 alembic = "^1.10.3"
 asyncpg = "^0.27.0"
 
+
+[tool.poetry.group.script.dependencies]
+sqlalchemy = "^2.0.9"
+selenium = "^4.9.0"
+psycopg2-binary = "^2.9.6"
+requests = "^2.28.2"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
