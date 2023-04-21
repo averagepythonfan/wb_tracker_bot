@@ -55,7 +55,7 @@ async def help_command(message: types.Message):
 async def add_product_command(message: types.Message):
     '''Add product to db'''
     try:
-        article = int(message.text[4:])
+        article = int(message.text.split()[1])
     except ValueError:
         return await message.reply('Введите корректный артикул')
     async with async_session_maker() as session:
@@ -95,7 +95,7 @@ async def list_command(message: types.Message):
 async def delete_product_command(message: types.Message):
     '''delete product by article'''
     try:    
-        article = int(message.text[7:])
+        article = int(message.text.split()[1])
         async with async_session_maker() as session:
             session: AsyncSession
             query = query = select(Product).where(Product.user_id == message.from_user.id)
@@ -118,8 +118,8 @@ async def delete_product_command(message: types.Message):
 async def set_n_trackers_command(message: types.Message):
     '''setting N trackers for user, only for ADMIN'''
     if message.from_user.id == ADMIN_ID:
-        args = message.text[4:].split()
-        user_id, track = int(args[0]), int(args[1])
+        args = message.text.split()
+        user_id, track = int(args[1]), int(args[2])
 
         async with async_session_maker() as session:
             session: AsyncSession
@@ -127,6 +127,7 @@ async def set_n_trackers_command(message: types.Message):
             await session.execute(query)
             await session.commit()
             await message.reply('Успешно')
+            logger.info(f'set {track} for user {user_id}')
 
 
 async def status_command(message: types.Message):
@@ -134,11 +135,11 @@ async def status_command(message: types.Message):
     async with async_session_maker() as session:
         session: AsyncSession
         query = select(User).where(User.user_id == message.from_user.id)
-        res = await session.execute(query)
-        res = res.scalar()
-        await message.reply(text=f"<b>User ID</b>: <i>{res.user_id}</i>\n"
-                            f"<b>User name</b>: <i>{res.username}</i>\n"
-                            f"<b>Tracker</b>: {res.track}",
+        result = await session.execute(query)
+        user = result.scalar()
+        await message.reply(text=f"<b>User ID</b>: <i>{user.user_id}</i>\n"
+                            f"<b>User name</b>: <i>{user.username}</i>\n"
+                            f"<b>Tracker</b>: {user.track}",
                             parse_mode='HTML')
         logger.info(f'user {message.from_user.id} is asking for status')
 
@@ -150,5 +151,6 @@ def register_message_handlers(router: Router):
     router.message.register(set_n_trackers_command, Command(commands=['set']))
     router.message.register(list_command, Command(commands=['list']))
     router.message.register(delete_product_command, Command(commands=['delete']))
+
     router.callback_query.register(callback_delete, Text(text=['delete_button_pressed']))
     router.callback_query.register(callback_cancel, Text(text=['cancel_button_pressed']))

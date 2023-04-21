@@ -3,8 +3,6 @@ __all__ = [
 ]
 
 
-from typing import AsyncGenerator
-
 from sqlalchemy.ext.asyncio import create_async_engine
 from sqlalchemy.engine import URL
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession
@@ -24,8 +22,3 @@ postgres_url = URL.create(
 
 engine: AsyncEngine = create_async_engine(url=postgres_url, echo=True)
 async_session_maker: AsyncSession = sessionmaker(engine, class_=AsyncSession, expire_on_commit=False)
-
-
-# async def get_async_session() -> AsyncGenerator[AsyncSession, None]:
-#     async with async_session_maker() as session:
-#         yield session

@@ -18,6 +18,7 @@ async def callback_delete(callback: CallbackQuery):
     await callback.message.reply(f'Успешно, {article}', reply_markup=kb_cancel)
     await callback.answer()
 
+
 async def callback_cancel(callback: CallbackQuery):
     '''cancel deletion'''
     article = callback.message.text.split()[1]

@@ -1,8 +1,4 @@
-from dotenv import load_dotenv
 import os
-
-# remove on prod
-load_dotenv()
 
 # tg_bot
 TOKEN: str = os.getenv('TOKEN')
