@@ -1,8 +1,3 @@
-/venv
 .env.example
 /__pycache__
-/handlers/__pycache__
-sqdb/__pycache__
-docker_commands.txt
 /pgdata
-docker-compose.yml

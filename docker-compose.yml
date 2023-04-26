@@ -54,7 +54,6 @@ services:
       - .env
     environment:
       HOST: psql_server
-      COMMAND_EXECUTOR: "172.18.0.1"
     volumes:
       - ./script:/app
     depends_on:
