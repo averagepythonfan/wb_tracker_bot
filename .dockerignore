@@ -1,3 +1,4 @@
 .env.example
 /__pycache__
 /pgdata
+/bot/.env
