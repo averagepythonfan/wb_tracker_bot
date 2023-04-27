@@ -1,0 +1,41 @@
+[tool.poetry]
+name = "wildberries-tracker"
+version = "0.1.0"
+description = "Telegram Bot for tracking prices on WB"
+authors = ["averagepythonfan <djonvorobei@bk.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+python-dotenv = "^1.0.0"
+
+
+[tool.poetry.group.bot.dependencies]
+aiogram = "3.0.0b7"
+sqlalchemy = "^2.0.9"
+alembic = "^1.10.3"
+asyncpg = "^0.27.0"
+
+
+[tool.poetry.group.script.dependencies]
+sqlalchemy = "^2.0.9"
+selenium = "^4.9.0"
+psycopg2-binary = "^2.9.6"
+requests = "^2.28.2"
+
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.1"
+pytest-asyncio = "^0.21.0"
+
+
+[tool.pytest.ini_options]
+pythonpath = [
+    ".", "bot"
+]
+asyncio_mode="auto"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

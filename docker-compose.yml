@@ -22,26 +22,40 @@ services:
       - wb_net
   geckodrive:
     image: instrumentisto/geckodriver
-    container_name: gecko
+    container_name: gecko_container
     ports:
       - "4444:4444"
+    depends_on:
+      - psql_server
     command: --binary=/opt/firefox/firefox --log=debug --host=0.0.0.0
     networks:
       - wb_net
-  bot_stable:
-    build: .
+  bot:
+    build:
+      context: .
+      dockerfile: bot/Dockerfile
     container_name: bot
     env_file:
       - .env
+    environment:
+      HOST: psql_server
+    volumes:
+      - ./bot:/app
     depends_on:
       - psql_server
     networks:
       - wb_net
   parser:
-    image: parser:final
+    build:
+      context: .
+      dockerfile: script/Dockerfile
     container_name: parser
     env_file:
       - .env
+    environment:
+      HOST: psql_server
+    volumes:
+      - ./script:/app
     depends_on:
       - psql_server
       - geckodrive
