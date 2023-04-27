@@ -23,6 +23,19 @@ selenium = "^4.9.0"
 psycopg2-binary = "^2.9.6"
 requests = "^2.28.2"
 
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^7.3.1"
+pytest-asyncio = "^0.21.0"
+
+
+[tool.pytest.ini_options]
+pythonpath = [
+    ".", "bot"
+]
+asyncio_mode="auto"
+
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
